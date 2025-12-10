@@ -1,27 +1,53 @@
-import os 
-os.system("cls" if os.name == "nt" else "clear")
+#Dev - MARIA EDUARDA PEDREIRA SOUZA TEIXEIRA
+
+import os
 import json
 from typing import List, Dict, Any
 
 FILE_NAME = "insumos.json"
 FILE_PATH = os.path.join(os.path.dirname(__file__), FILE_NAME)
 
+# Lista de dicionários para armazenar produtos
+estoque: List[Dict[str, Any]] = []
 
-def carregar_insumos() -> List[Dict[str, Any]]:
+
+def carregar_insumos() -> None:
+    """Carrega produtos do arquivo JSON para a lista estoque."""
+    global estoque
     if not os.path.exists(FILE_PATH):
-        return []
+        estoque = []
+        return
     try:
         with open(FILE_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
             if isinstance(data, list):
-                return data
-            return []
-    except Exception:
-        return []
+                estoque = data
+            else:
+                estoque = []
+    except Exception as e:
+        print(f"Erro ao carregar insumos: {e}")
+        estoque = []
 
-estoque = {}
 
-def cadastrar_insumo():
+def salvar_insumos() -> None:
+    """Salva a lista de produtos no arquivo JSON."""
+    try:
+        with open(FILE_PATH, "w", encoding="utf-8") as f:
+            json.dump(estoque, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Erro ao salvar insumos: {e}")
+
+
+def _buscar_produto(codigo: str) -> int:
+    """Retorna o índice do produto ou -1 se não encontrado."""
+    for i, produto in enumerate(estoque):
+        if produto["codigo"] == codigo:
+            return i
+    return -1
+
+
+def cadastrar_insumo() -> None:
+    """Cadastra um novo insumo na lista."""
     print("\n--- Cadastrar Insumo ---")
     
     codigo = input("Código do insumo: ").strip()
